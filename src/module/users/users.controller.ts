@@ -3,32 +3,31 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('users')
+@Controller('api/v1/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Get("/:id")
+  getOne(@Param('id') user_id: number) {
+    return this.usersService.findOne(user_id);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Post("/register")
+ async register(@Body() body:any){
+    const user_name = body.user_name
+    const checkExist = await this.usersService.getUserByUserName(user_name);
+    if(checkExist){
+      return {message:"User already exist"}
+    }
+    return this.usersService.register(body);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Post("/login")
+  async login(@Body() body:any){
+    const user_name = body.user_name
+    const user_email = body.user_email
+    // const password = body.password
+    const check = await this.usersService.checkLogin(user_name, user_email);
+    return check.message
   }
 }
