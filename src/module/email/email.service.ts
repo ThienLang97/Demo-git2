@@ -1,26 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEmailDto } from './dto/create-email.dto';
-import { UpdateEmailDto } from './dto/update-email.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { join } from 'path';
 
 @Injectable()
 export class EmailService {
-  create(createEmailDto: CreateEmailDto) {
-    return 'This action adds a new email';
-  }
-
-  findAll() {
-    return `This action returns all email`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} email`;
-  }
-
-  update(id: number, updateEmailDto: UpdateEmailDto) {
-    return `This action updates a #${id} email`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} email`;
+  constructor(private mailerService: MailerService) { }
+  async sendEmailUser(data: any) {
+    const pathTemplate = join(__dirname, 'templates', 'confirmation.ejs')
+    await this.mailerService.sendMail({
+      to: data?.email,
+      subject: 'Buy Product',
+      template: pathTemplate,
+      context: {
+        name: data?.name,
+        product: data?.product_name,
+      }
+    })
+    return 'gui thanh cong';
   }
 }
